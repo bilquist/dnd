@@ -19,7 +19,7 @@ class NewVisitorTest(unittest.TestCase):
 		self.browser.get('http://localhost:8000')
 
 		# She notices the page title and header mention 'Drage Eventyr'
-		self.assertIn('Critical Skol', self.browser.title)
+		self.assertIn('Initiative', self.browser.title)
 
 		# Auto fail
 		self.fail('Finish the test!')
