@@ -15,6 +15,12 @@ class NewVisitorTest(unittest.TestCase):
 	def tearDown(self):
 		self.browser.quit()
 	
+	def check_for_row_in_participant_table(self, row_text):
+		table = self.browser.find_element_by_id('id_participant_table')
+		rows = table.find_elements_by_tag_name('tr')
+		self.assertIn(row_text, [row.text for row in rows])
+		
+	
 	def test_can_start_an_initiative_and_retrieve_it_later(self):
 		# Alice has heard about a cool new online dnd app. She goes
 		# to check out its homepage
@@ -39,17 +45,22 @@ class NewVisitorTest(unittest.TestCase):
 		# When she hits enter, the page updates, and now the page
 		# "1: Player Character 1" as an item in the participant list
 		inputbox.send_keys(Keys.ENTER)
-		time.sleep(10)
-		
-		table = self.browser.find_element_by_id('id_participant_table')
-		rows = table.find_elements_by_tag_name('tr')
-		self.assertTrue(
-			any(row.text == '1: Player Character 1' for row in rows),
-			"New participant did not appear in the table"
-		)
+		time.sleep(1)
+		self.check_for_row_in_participant_table('1: Player Character 1')
 		
 		# There is still a text box inviting her to add another participant
 		# She enters, "Player Character 2"
+		inputbox = self.browser.find_element_by_id('id_new_participant')
+		inputbox.send_keys('Player Character 2')
+		inputbox.send_keys(Keys.ENTER)
+		time.sleep(1)
+		
+		# The page updates again, and now shows both characters as participants
+		self.check_for_row_in_participant_table('1: Player Character 1')
+		self.check_for_row_in_participant_table('2: Player Character 2')
+		
+		# Alice wonders whether the site will remember her list. Then she sees...
+		# ...TODO...
 
 		# Auto fail
 		self.fail('Finish the test!')
