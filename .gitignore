@@ -1,3 +1,5 @@
-"geckodriver.log" 
-"*.secret" 
-"venv/*" 
+geckodriver.log
+*.secret
+/venv/
+__pycache__
+*.pyc
