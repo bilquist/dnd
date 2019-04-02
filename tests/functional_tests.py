@@ -22,8 +22,9 @@ class NewVisitorTest(unittest.TestCase):
 
 		# She notices the page title and header mention 'Initiative'
 		self.assertIn('Initiative', self.browser.title)
-		header_text = self.browser.find_element_by_tag_name('h1')
-		self.assertIn('Participants', headder_text)
+		header_text = self.browser.find_element_by_tag_name('h1').text
+		self.assertIn('Participants', header_text)
+		self.assertEqual('Participants', header_text)
 		
 		# She is invited to enter a participant right away
 		inputbox = self.browser.find_element_by_id('id_new_participant')
@@ -43,7 +44,8 @@ class NewVisitorTest(unittest.TestCase):
 		table = self.browser.find_element_by_id('id_participant_table')
 		rows = table.find_elements_by_tag_name('tr')
 		self.assertTrue(
-			any(row.text == '1: Player Character 1' for row in rows)
+			any(row.text == '1: Player Character 1' for row in rows),
+			"New participant did not appear in the table"
 		)
 		
 		# There is still a text box inviting her to add another participant
