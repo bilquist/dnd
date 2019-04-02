@@ -2,7 +2,7 @@
 
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
-from initiative.models import Participant
+from initiative.models import Initiative, Participant
 
 
 # Create your views here.
@@ -14,5 +14,6 @@ def initiative_list(request):
 	return render(request, 'initiative/initiative.html', {'participants': participants})
 
 def new_initiative(request):
-	Participant.objects.create(name=request.POST['participant_text'])
+	initiative = Initiative.objects.create()
+	Participant.objects.create(name=request.POST['participant_text'], initiative=initiative)
 	return redirect('/initiative/the-only-list-in-the-world/')

@@ -3,7 +3,7 @@
 from django.urls import resolve
 from django.test import TestCase
 from django.http import HttpRequest
-from initiative.models import Participant
+from initiative.models import Initiative, Participant
 
 from initiative.views import home_page
 
@@ -20,15 +20,23 @@ class HomePageTest(TestCase):
 class ParticipantModelTest(TestCase):
 	
 	def test_saving_and_retrieving_participants(self):
+		initiative = Initiative()
+		initiative.save()
+		
 		first_participant = Participant()
 		first_participant.name = 'Alice'
 		first_participant.is_pc = 1
+		first_participant.initiative = initiative
 		first_participant.save()
 		
 		second_participant = Participant()
 		second_participant.name = 'Bob'
 		second_participant.is_pc = 1
+		second_participant.initiative = initiative
 		second_participant.save()
+		
+		saved_initiative = Initiative.objects.first()
+		self.assertEqual(saved_initiative, initiative)
 		
 		saved_participants = Participant.objects.all()
 		self.assertEqual(saved_participants.count(), 2)
@@ -37,7 +45,10 @@ class ParticipantModelTest(TestCase):
 		second_saved_participant = saved_participants[1]
 		self.assertEqual(first_saved_participant.name, 'Alice')
 		self.assertEqual(first_saved_participant.is_pc, 1)
+		self.assertEqual(first_saved_participant.initiative, initiative)
 		self.assertEqual(second_saved_participant.name, 'Bob')
+		self.assertEqual(second_saved_participant.initiative, initiative)
+		
 
 
 class InitiativeViewTest(TestCase):
@@ -47,8 +58,9 @@ class InitiativeViewTest(TestCase):
 		self.assertTemplateUsed(response, 'initiative/initiative.html')
 	
 	def test_displays_all_participants(self):
-		Participant.objects.create(name='Alice')
-		Participant.objects.create(name='Bob')
+		initiative = Initiative.objects.create()
+		Participant.objects.create(name='Alice', initiative=initiative)
+		Participant.objects.create(name='Bob', initiative=initiative)
 		
 		response = self.client.get('/initiative/the-only-list-in-the-world/')
 		
