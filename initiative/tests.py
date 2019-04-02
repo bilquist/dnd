@@ -26,20 +26,11 @@ class HomePageTest(TestCase):
 	def test_redirects_after_POST(self):
 		response = self.client.post('/', data={'participant_text': 'James Ihara'})
 		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response['location'], '/')
+		self.assertEqual(response['location'], '/initiative/the-only-list-in-the-world/')
 	
 	def test_only_saves_items_when_necessary(self):
 		self.client.get('/')
 		self.assertEqual(Participant.objects.count(), 0)
-	
-	def test_displays_all_participants(self):
-		Participant.objects.create(name='Alice')
-		Participant.objects.create(name='Bob')
-		
-		response = self.client.get('/')
-		
-		self.assertIn('Alice', response.content.decode())
-		self.assertIn('Bob', response.content.decode())
 
 
 class ParticipantModelTest(TestCase):
@@ -63,6 +54,21 @@ class ParticipantModelTest(TestCase):
 		self.assertEqual(first_saved_participant.name, 'Alice')
 		self.assertEqual(first_saved_participant.is_pc, 1)
 		self.assertEqual(second_saved_participant.name, 'Bob')
+
+
+class InitiativeViewTest(TestCase):
+	
+	def test_uses_initiative_template(self):
+		response = self.client.get('/initiative/the-only-list-in-the-world/')
+		self.assertTemplateUsed(response, 'initiative/initiative.html')
+	
+	def test_displays_all_participants(self):
+		Participant.objects.create(name='Alice')
+		Participant.objects.create(name='Bob')
 		
+		response = self.client.get('/initiative/the-only-list-in-the-world/')
+		
+		self.assertContains(response, 'Alice')
+		self.assertContains(response, 'Bob')
 		
 		

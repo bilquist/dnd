@@ -8,5 +8,15 @@
 			<input name="participant_text" id="id_new_participant" placeholder="Enter a participant" />
 			{% csrf_token %}
 		</form>
+		
+		<table id="id_participant_table">
+			{% for participant in participants %}
+				<tr>
+					<td>{{ forloop.counter}}: {{ participant.name }}</td>
+					<!-- <td>{{ participant.is_pc }}</td> -->
+				</tr>
+			{% endfor %}
+		</table>
+		
 	</body>
 </html>

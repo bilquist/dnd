@@ -79,7 +79,7 @@ class NewVisitorTest(LiveServerTestCase):
 		# She notices that her list has a unique URL
 		alice_initiative_url = self.browser.current_url
 		
-		self.assertRegex(alice_initiative_url, '/initiative/(/d+)')
+		self.assertRegex(alice_initiative_url, '/initiative/.+')
 		
 		# Now a new user, Francis, comes along to the site
 		
@@ -103,7 +103,7 @@ class NewVisitorTest(LiveServerTestCase):
 		
 		# Francis gets his own URL
 		francis_initiative_url = self.browser.current_url
-		self.assertRegex(francis_initiative_url, '/initiative/(/d+)')
+		self.assertRegex(francis_initiative_url, '/initiative/.+')
 		self.assertNotEqual(francis_initiative_url, alice_initiative_url)
 		
 		# Again, there is no trace of Alice's initiative

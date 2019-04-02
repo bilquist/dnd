@@ -21,4 +21,5 @@ from django.conf.urls import url
 urlpatterns = [
     path('admin/', admin.site.urls),
 	path('', views.home_page, name='home'),
+	path('initiative/the-only-list-in-the-world/', views.initiative_list, name='initiative_list'),
 ]

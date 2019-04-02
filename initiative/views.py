@@ -9,8 +9,10 @@ from initiative.models import Participant
 def home_page(request):
 	if request.method == 'POST':
 		Participant.objects.create(name=request.POST['participant_text'])
-		return redirect('/')
+		return redirect('/initiative/the-only-list-in-the-world/')
 
+	return render(request, 'initiative/home.html')
+
+def initiative_list(request):
 	participants = Participant.objects.all()
-	return render(request, 'initiative/home.html', {'participants': participants})
-
+	return render(request, 'initiative/initiative.html', {'participants': participants})
