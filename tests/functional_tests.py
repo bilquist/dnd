@@ -39,7 +39,7 @@ class NewVisitorTest(unittest.TestCase):
 		# When she hits enter, the page updates, and now the page
 		# "1: Player Character 1" as an item in the participant list
 		inputbox.send_keys(Keys.ENTER)
-		time.sleep(1)
+		time.sleep(10)
 		
 		table = self.browser.find_element_by_id('id_participant_table')
 		rows = table.find_elements_by_tag_name('tr')
