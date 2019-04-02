@@ -17,9 +17,29 @@ class HomePageTest(TestCase):
 		self.assertTemplateUsed(response, 'initiative/home.html')
 	
 	def test_can_save_a_POST_request(self):
-		response = self.client.post('/', data={'participant_text': 'A new participant'})
-		self.assertIn('A new participant', response.content.decode())
-		self.assertTemplateUsed(response, 'initiative/home.html')
+		response = self.client.post('/', data={'participant_text': 'James Ihara'})
+		
+		self.assertEqual(Participant.objects.count(), 1)
+		new_participant = Participant.objects.first()
+		self.assertEqual(new_participant.name, 'James Ihara')
+		
+	def test_redirects_after_POST(self):
+		response = self.client.post('/', data={'participant_text': 'James Ihara'})
+		self.assertEqual(response.status_code, 302)
+		self.assertEqual(response['location'], '/')
+	
+	def test_only_saves_items_when_necessary(self):
+		self.client.get('/')
+		self.assertEqual(Participant.objects.count(), 0)
+	
+	def test_displays_all_participants(self):
+		Participant.objects.create(name='Alice')
+		Participant.objects.create(name='Bob')
+		
+		response = self.client.get('/')
+		
+		self.assertIn('Alice', response.content.decode())
+		self.assertIn('Bob', response.content.decode())
 
 
 class ParticipantModelTest(TestCase):

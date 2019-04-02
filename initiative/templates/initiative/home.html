@@ -10,7 +10,12 @@
 		</form>
 		
 		<table id="id_participant_table">
-			<tr><td>1: {{ new_participant_text }}</td></tr>
+			{% for participant in participants %}
+				<tr>
+					<td>{{ forloop.counter}}: {{ participant.name }}</td>
+					<td>{{ participant.is_pc }}</td>
+				</tr>
+			{% endfor %}
 		</table>
 		
 	</body>
