@@ -15,22 +15,6 @@ class HomePageTest(TestCase):
 	def test_home_page_returns_correct_html(self):
 		response = self.client.get('/')
 		self.assertTemplateUsed(response, 'initiative/home.html')
-	
-	def test_can_save_a_POST_request(self):
-		response = self.client.post('/', data={'participant_text': 'James Ihara'})
-		
-		self.assertEqual(Participant.objects.count(), 1)
-		new_participant = Participant.objects.first()
-		self.assertEqual(new_participant.name, 'James Ihara')
-		
-	def test_redirects_after_POST(self):
-		response = self.client.post('/', data={'participant_text': 'James Ihara'})
-		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response['location'], '/initiative/the-only-list-in-the-world/')
-	
-	def test_only_saves_items_when_necessary(self):
-		self.client.get('/')
-		self.assertEqual(Participant.objects.count(), 0)
 
 
 class ParticipantModelTest(TestCase):
@@ -70,5 +54,17 @@ class InitiativeViewTest(TestCase):
 		
 		self.assertContains(response, 'Alice')
 		self.assertContains(response, 'Bob')
+		
+class NewInitiativeTest(TestCase):
+
+	def test_can_save_a_POST_request(self):
+		response = self.client.post('/initiative/new', data={'participant_text': 'James Ihara'})
+		self.assertEqual(Participant.objects.count(), 1)
+		new_participant = Participant.objects.first()
+		self.assertEqual(new_participant.name, 'James Ihara')
+		
+	def test_redirects_after_POST(self):
+		response = self.client.post('/initiative/new', data={'participant_text': 'James Ihara'})
+		self.assertRedirects(response, '/initiative/the-only-list-in-the-world/')
 		
 		
