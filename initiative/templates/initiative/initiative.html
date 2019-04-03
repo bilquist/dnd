@@ -5,7 +5,7 @@
 {% block form_action %}/initiative/{{ initiative.id }}/add_participant{% endblock %}
 
 {% block table %}
-	<table id="id_participant_table">
+	<table id="id_participant_table" class="table">
 		{% for participant in initiative.participant_set.all %}
 			<tr>
 				<td>{{ forloop.counter}}: {{ participant.name }}</td>
