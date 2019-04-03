@@ -5,7 +5,7 @@ from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 import time
-
+import os
 
 
 class NewVisitorTest(StaticLiveServerTestCase):
@@ -13,6 +13,10 @@ class NewVisitorTest(StaticLiveServerTestCase):
 	def setUp(self):
 		self.browser = webdriver.Firefox()
 		self.MAX_WAIT = 10
+		
+		staging_server = os.environ.get('STAGING_SERVER')
+		if staging_server:
+			self.live_server_url = 'http://' + staging_server
 	
 	def tearDown(self):
 		self.browser.quit()
@@ -114,7 +118,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
 		# Satisfied, they both go back to sleep
 
 		# Auto fail
-		self.fail('Finish the test!')
+		#self.fail('Finish the test!')
 		
 		# She is invited to click to create an account
 
