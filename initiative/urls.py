@@ -1,4 +1,6 @@
-"""dnd URL Configuration
+# initiative/urls.py
+
+"""dnd/initiative URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.2/topics/http/urls/
@@ -13,16 +15,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.conf.urls import include, url
-from django.urls import path
 
-from initiative import views as initiative_views
-from initiative import urls as initiative_urls
+from django.urls import path
+from django.urls import path
+from initiative import views
 
 
 urlpatterns = [
-    #path('admin/', admin.site.urls),
-	path('', initiative_views.home_page, name='home'),
-	path('initiative/', include(initiative_urls)),
+	path('new', views.new_initiative, name='new_initiative'),
+	path('<int:initiative_id>/', views.initiative_list, name='initiative_list'),
+	path('<int:initiative_id>/add_participant', views.add_participant, name='add_participant'),
 ]
