@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 	path('', views.home_page, name='home'),
 	path('initiative/new', views.new_initiative, name='new_initiative'),
-	path('initiative/the-only-list-in-the-world/', views.initiative_list, name='initiative_list'),
+	path('initiative/<int:initiative_id>/', views.initiative_list, name='initiative_list'),
+	path('initiative/<int:initiative_id>/add_participant', views.add_participant, name='add_participant'),
 ]

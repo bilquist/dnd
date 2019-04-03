@@ -54,29 +54,61 @@ class ParticipantModelTest(TestCase):
 class InitiativeViewTest(TestCase):
 	
 	def test_uses_initiative_template(self):
-		response = self.client.get('/initiative/the-only-list-in-the-world/')
+		initiative = Initiative.objects.create()
+		response = self.client.get(f'/initiative/{initiative.id}/')
 		self.assertTemplateUsed(response, 'initiative/initiative.html')
 	
-	def test_displays_all_participants(self):
-		initiative = Initiative.objects.create()
-		Participant.objects.create(name='Alice', initiative=initiative)
-		Participant.objects.create(name='Bob', initiative=initiative)
+	def test_displays_only_participants_for_that_initiative(self):
+		correct_initiative = Initiative.objects.create()
+		Participant.objects.create(name='Player 1', initiative=correct_initiative)
+		Participant.objects.create(name='Player 2', initiative=correct_initiative)
 		
-		response = self.client.get('/initiative/the-only-list-in-the-world/')
+		other_initiative = Initiative.objects.create()
+		Participant.objects.create(name='Ghost 1', initiative=other_initiative)
+		Participant.objects.create(name='Ghost 2', initiative=other_initiative)
 		
-		self.assertContains(response, 'Alice')
-		self.assertContains(response, 'Bob')
+		response = self.client.get(f'/initiative/{correct_initiative.id}/')
+		
+		self.assertTemplateUsed(response, 'initiative/initiative.html')
+		self.assertContains(response, 'Player 1')
+		self.assertContains(response, 'Player 2')
+		self.assertNotContains(response, 'Ghost 1')
+		self.assertNotContains(response, 'Ghost 2')
+	
+	def test_passes_correct_initiative_to_template(self):
+		other_initiative = Initiative.objects.create()
+		correct_initiative = Initiative.objects.create()
+		response = self.client.get(f'/initiative/{correct_initiative.id}/')
+		self.assertTemplateUsed(response, 'initiative/initiative.html')
+		self.assertEqual(response.context['initiative'], correct_initiative)
+		
 		
 class NewInitiativeTest(TestCase):
 
-	def test_can_save_a_POST_request(self):
-		response = self.client.post('/initiative/new', data={'participant_text': 'James Ihara'})
+	def test_can_save_a_POST_request_to_an_existing_initiative(self):
+		other_initiative = Initiative.objects.create()
+		correct_initiative = Initiative.objects.create()
+		
+		self.client.post(
+			f'/initiative/{correct_initiative.id}/add_participant',
+			data={'participant_text': 'James Ihara'}
+		)
+		
 		self.assertEqual(Participant.objects.count(), 1)
 		new_participant = Participant.objects.first()
 		self.assertEqual(new_participant.name, 'James Ihara')
+		self.assertEqual(new_participant.initiative, correct_initiative)
 		
-	def test_redirects_after_POST(self):
-		response = self.client.post('/initiative/new', data={'participant_text': 'James Ihara'})
-		self.assertRedirects(response, '/initiative/the-only-list-in-the-world/')
+	def test_redirects_to_initiative_view(self):
+		other_initiative = Initiative.objects.create()
+		correct_initiative = Initiative.objects.create()
+		
+		response = self.client.post(
+			f'/initiative/{correct_initiative.id}/add_participant',
+			data={'participant_text': 'James Ihara'}
+		)
+		
+		
+		self.assertRedirects(response, f'/initiative/{correct_initiative.id}/')
 		
 		
