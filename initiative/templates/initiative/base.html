@@ -1,0 +1,15 @@
+<html>
+	<head>
+		<title>Initiative</title>
+	</head>
+	
+	<body>
+		<h1>{% block header_text %}{% endblock %}</h1>
+		<form method="POST" action="{% block form_action %}{% endblock %}">
+			<input name="participant_text" id="id_new_participant" placeholder="Enter a participant" />
+			{% csrf_token %}
+		</form>
+		{% block table %}
+		{% endblock %}
+	</body>
+</html>

@@ -1,12 +1,5 @@
-<html>
-	<head>
-		<title>Initiative</title>
-	</head>
-	<body>
-		<h1>Participants</h1>
-		<form method="POST" action="/initiative/new">
-			<input name="participant_text" id="id_new_participant" placeholder="Enter a participant" />
-			{% csrf_token %}
-		</form>
-	</body>
-</html>
+{% extends 'initiative/base.html' %}
+
+{% block header_text %}Start a new Initiative{% endblock %}
+
+{% block form_action %}/initiative/new{% endblock %}

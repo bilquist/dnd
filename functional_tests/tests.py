@@ -38,8 +38,8 @@ class NewVisitorTest(LiveServerTestCase):
 		# She notices the page title and header mention 'Initiative'
 		self.assertIn('Initiative', self.browser.title)
 		header_text = self.browser.find_element_by_tag_name('h1').text
-		self.assertIn('Participants', header_text)
-		self.assertEqual('Participants', header_text)
+		self.assertIn('Start a new Initiative', header_text)
+		self.assertEqual('Start a new Initiative', header_text)
 		
 		# She is invited to enter a participant right away
 		inputbox = self.browser.find_element_by_id('id_new_participant')
