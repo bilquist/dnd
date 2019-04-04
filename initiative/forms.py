@@ -22,3 +22,6 @@ class ParticipantForm(forms.models.ModelForm):
 			'name': {'required': EMPTY_PARTICIPANT_ERROR}
 		}
 	
+	def save(self, for_initiative):
+		self.instance.initiative = for_initiative
+		return super().save()

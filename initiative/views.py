@@ -19,7 +19,7 @@ def view_initiative(request, initiative_id):
 	if request.method == 'POST':
 		form = ParticipantForm(data=request.POST)
 		if form.is_valid():
-			Participant.objects.create(name=request.POST['name'], initiative=initiative)
+			form.save(for_initiative=initiative)
 			return redirect(initiative)
 	return render(request, 'initiative/initiative.html', {'initiative': initiative, 'form': form})
 	

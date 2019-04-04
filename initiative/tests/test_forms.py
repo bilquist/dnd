@@ -3,6 +3,7 @@
 from django.test import TestCase
 
 from initiative.forms import EMPTY_PARTICIPANT_ERROR, ParticipantForm
+from initiative.models import Initiative, Participant
 
 
 
@@ -18,3 +19,11 @@ class ParticipantFormTest(TestCase):
 		self.assertFalse(form.is_valid())
 		print(form.errors.keys())
 		self.assertEqual(form.errors['name'], [EMPTY_PARTICIPANT_ERROR])
+	
+	def test_form_save_handles_saving_to_a_list(self):
+		initiative = Initiative.objects.create()
+		form = ParticipantForm(data={'name': 'Scooby DooMe'})
+		new_participant = form.save(for_initiative=initiative)
+		self.assertEqual(new_participant, Participant.objects.first())
+		self.assertEqual(new_participant.name, 'Scooby DooMe')
+		self.assertEqual(new_participant.initiative, initiative)
