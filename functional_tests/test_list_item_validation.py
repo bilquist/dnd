@@ -6,7 +6,7 @@ from .base import FunctionalTest
 
 
 
-class ItemValidationTest(FunctionalTest):
+class ParticipantValidationTest(FunctionalTest):
 	
 	def test_cannot_add_empty_list_items(self):
 		# Alice goes to the home page and accidently tries to submit
@@ -48,7 +48,21 @@ class ItemValidationTest(FunctionalTest):
 		self.get_participant_input_box().send_keys(Keys.ENTER)
 		self.wait_for_row_in_participant_table('1: Test Participant')
 		self.wait_for_row_in_participant_table('2: Magician Waldo')
-
+	
+	def test_cannot_add_duplicate_participants(self):
+		# Alice goes to the home page and starts a new list
+		self.browser.get(self.live_server_url)
+		self.get_participant_input_box().send_keys('Babe')
+		self.get_participant_input_box().send_keys(Keys.ENTER)
+		self.wait_for_row_in_participant_table('1: Babe')
 		
+		# She accidently tries to enter a duplicate participant
+		self.get_participant_input_box().send_keys('Babe')
+		self.get_participant_input_box().send_keys(Keys.ENTER)
 		
+		# She sees a helpful error message
+		self.wait_for(lambda: self.assertEqual(
+			self.browser.find_element_by_css_selector('.has-error').text,
+			"You've already got this in your initiative"
+		))
 		

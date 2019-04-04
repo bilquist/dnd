@@ -7,37 +7,28 @@ from initiative.models import Initiative, Participant
 
 
 # Create your tests here.
-class ParticipantModelsTest(TestCase):
+class InitiativeAndParticipantModelsTest(TestCase):
+
+	def test_participant_is_related_to_initiative(self):
+		initiative = Initiative.objects.create()
+		participant = Participant()
+		participant.initiative = initiative
+		participant.save()
+		self.assertIn(participant, initiative.participant_set.all())
+
+
+class InitiativeModelTest(TestCase):
 	
-	def test_saving_and_retrieving_participants(self):
-		initiative = Initiative()
-		initiative.save()
-		
-		first_participant = Participant()
-		first_participant.name = 'Alice'
-		first_participant.is_pc = 1
-		first_participant.initiative = initiative
-		first_participant.save()
-		
-		second_participant = Participant()
-		second_participant.name = 'Bob'
-		second_participant.is_pc = 1
-		second_participant.initiative = initiative
-		second_participant.save()
-		
-		saved_initiative = Initiative.objects.first()
-		self.assertEqual(saved_initiative, initiative)
-		
-		saved_participants = Participant.objects.all()
-		self.assertEqual(saved_participants.count(), 2)
-		
-		first_saved_participant = saved_participants[0]
-		second_saved_participant = saved_participants[1]
-		self.assertEqual(first_saved_participant.name, 'Alice')
-		self.assertEqual(first_saved_participant.is_pc, 1)
-		self.assertEqual(first_saved_participant.initiative, initiative)
-		self.assertEqual(second_saved_participant.name, 'Bob')
-		self.assertEqual(second_saved_participant.initiative, initiative)
+	def test_get_absolute_url(self):
+		initiative = Initiative.objects.create()
+		self.assertEqual(initiative.get_absolute_url(), f'/initiative/{initiative.id}/')
+
+
+class ParticipantModelTest(TestCase):
+	
+	def test_default_name(self):
+		participant = Participant()
+		self.assertEqual(participant.name, '')
 	
 	def test_cannot_save_empty_initiative_participants(self):
 		initiative = Initiative.objects.create()
@@ -46,7 +37,30 @@ class ParticipantModelsTest(TestCase):
 			participant.save()
 			participant.full_clean()
 	
-	def test_get_absolute_url(self):
+	def test_duplicate_participants_are_invalid(self):
 		initiative = Initiative.objects.create()
-		self.assertEqual(initiative.get_absolute_url(), f'/initiative/{initiative.id}/')
-		
+		Participant.objects.create(name='bla', initiative=initiative)
+		with self.assertRaises(ValidationError):
+			participant = Participant(name='bla', initiative=initiative)
+			participant.full_clean()
+	
+	def test_CAN_save_item_to_different_initiatives(self):
+		initiative1 = Initiative.objects.create()
+		initiative2 = Initiative.objects.create()
+		Participant.objects.create(name='bla', initiative=initiative1)
+		participant = Participant(name='bla', initiative=initiative2)
+		participant.full_clean() # should not raise
+	
+	def test_initiative_ordering(self):
+		initiative = Initiative.objects.create()
+		participant1 = Participant.objects.create(name='p1', initiative=initiative)
+		participant2 = Participant.objects.create(name='p2', initiative=initiative)
+		participant3 = Participant.objects.create(name='p3', initiative=initiative)
+		self.assertEqual(
+			list(Participant.objects.all()),
+			[participant1, participant2, participant3]
+		)
+	
+	def test_string_representation(self):
+		participant = Participant(name='some name')
+		self.assertEqual(str(participant), 'some name')

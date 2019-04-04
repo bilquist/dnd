@@ -17,4 +17,10 @@ class Participant(models.Model):
 	is_pc = models.BooleanField(default=False)
 	initiative = models.ForeignKey(Initiative, on_delete=models.CASCADE, default=None)
 	
+	class Meta:
+		ordering = ('id',)
+		unique_together = ('initiative', 'name')
+	
+	def __str__(self):
+		return self.name
 	
