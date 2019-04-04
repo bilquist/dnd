@@ -23,6 +23,5 @@ from initiative import views
 
 urlpatterns = [
 	path('new', views.new_initiative, name='new_initiative'),
-	path('<int:initiative_id>/', views.initiative_list, name='initiative_list'),
-	path('<int:initiative_id>/add_participant', views.add_participant, name='add_participant'),
+	path('<int:initiative_id>/', views.view_initiative, name='view_initiative'),
 ]

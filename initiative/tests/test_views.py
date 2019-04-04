@@ -47,16 +47,13 @@ class InitiativeViewTest(TestCase):
 		response = self.client.get(f'/initiative/{correct_initiative.id}/')
 		self.assertTemplateUsed(response, 'initiative/initiative.html')
 		self.assertEqual(response.context['initiative'], correct_initiative)
-		
-		
-class NewInitiativeTest(TestCase):
-
+	
 	def test_can_save_a_POST_request_to_an_existing_initiative(self):
 		other_initiative = Initiative.objects.create()
 		correct_initiative = Initiative.objects.create()
 		
 		self.client.post(
-			f'/initiative/{correct_initiative.id}/add_participant',
+			f'/initiative/{correct_initiative.id}/',
 			data={'participant_text': 'James Ihara'}
 		)
 		
@@ -65,16 +62,19 @@ class NewInitiativeTest(TestCase):
 		self.assertEqual(new_participant.name, 'James Ihara')
 		self.assertEqual(new_participant.initiative, correct_initiative)
 		
-	def test_redirects_to_initiative_view(self):
+	def test_POST_redirects_to_initiative_view(self):
 		other_initiative = Initiative.objects.create()
 		correct_initiative = Initiative.objects.create()
 		
 		response = self.client.post(
-			f'/initiative/{correct_initiative.id}/add_participant',
+			f'/initiative/{correct_initiative.id}/',
 			data={'participant_text': 'James Ihara'}
 		)
 		
 		self.assertRedirects(response, f'/initiative/{correct_initiative.id}/')
+		
+		
+class NewInitiativeTest(TestCase):
 	
 	def test_validation_errors_are_sent_back_to_home_page_template(self):
 		response = self.client.post('/initiative/new', data={'participant_text': ''})

@@ -10,8 +10,11 @@ from initiative.models import Initiative, Participant
 def home_page(request):
 	return render(request, 'initiative/home.html')
 
-def initiative_list(request, initiative_id):
+def view_initiative(request, initiative_id):
 	initiative = Initiative.objects.get(id=initiative_id)
+	if request.method == 'POST':
+		Participant.objects.create(name=request.POST['participant_text'], initiative=initiative)
+		return redirect(f'/initiative/{initiative.id}/')
 	return render(request, 'initiative/initiative.html', {'initiative': initiative})
 	
 def new_initiative(request):
@@ -26,7 +29,3 @@ def new_initiative(request):
 		return render(request, 'initiative/home.html', {'error': error})
 	return redirect(f'/initiative/{initiative.id}/')
 
-def add_participant(request, initiative_id):
-	initiative = Initiative.objects.get(id=initiative_id)
-	Participant.objects.create(name=request.POST['participant_text'], initiative=initiative)
-	return redirect(f'/initiative/{initiative.id}/')
