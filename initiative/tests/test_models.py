@@ -45,4 +45,8 @@ class ParticipantModelsTest(TestCase):
 		with self.assertRaises(ValidationError):
 			participant.save()
 			participant.full_clean()
+	
+	def test_get_absolute_url(self):
+		initiative = Initiative.objects.create()
+		self.assertEqual(initiative.get_absolute_url(), f'/initiative/{initiative.id}/')
 		

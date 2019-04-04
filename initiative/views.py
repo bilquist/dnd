@@ -19,7 +19,7 @@ def view_initiative(request, initiative_id):
 			participant = Participant(name=request.POST['participant_text'], initiative=initiative)
 			participant.full_clean()
 			participant.save()
-			return redirect(f'/initiative/{initiative.id}/')
+			return redirect(initiative)
 		except ValidationError:
 			error = "You can't have an empty initiative participant!"
 	return render(request, 'initiative/initiative.html', {'initiative': initiative, 'error': error})
@@ -34,5 +34,5 @@ def new_initiative(request):
 		initiative.delete()
 		error = "You can't have an empty initiative participant!"
 		return render(request, 'initiative/home.html', {'error': error})
-	return redirect(f'/initiative/{initiative.id}/')
+	return redirect(initiative)
 
