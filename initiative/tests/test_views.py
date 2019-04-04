@@ -4,7 +4,7 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import resolve
 from django.utils.html import escape
-from initiative.forms import ParticipantForm
+from initiative.forms import ParticipantForm, EMPTY_PARTICIPANT_ERROR
 from initiative.models import Initiative, Participant
 from initiative.views import home_page
 
@@ -77,32 +77,52 @@ class InitiativeViewTest(TestCase):
 		)
 		
 		self.assertRedirects(response, f'/initiative/{correct_initiative.id}/')
-	
-	def test_validation_errors_end_up_on_initiative_page(self):
+		
+	def post_invalid_input(self):
 		initiative = Initiative.objects.create()
-		response = self.client.post(
+		return self.client.post(
 			f'/initiative/{initiative.id}/',
 			data={'name': ''}
 		)
+	
+	def test_for_invalid_input_nothing_saved_to_db(self):
+		self.post_invalid_input()
+		self.assertEqual(Participant.objects.count(), 0)
+	
+	def test_for_invalid_input_renders_initiative_template(self):
+		response = self.post_invalid_input()
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'initiative/initiative.html')
-		expected_error = escape("You can't have an empty initiative participant!")
-		self.assertContains(response, expected_error)
+	
+	def test_for_invalid_input_passes_form_to_template(self):
+		response = self.post_invalid_input()
+		self.assertIsInstance(response.context['form'], ParticipantForm)
+	
+	def test_for_invalid_input_shows_error_on_page(self):
+		response = self.post_invalid_input()
+		self.assertContains(response, escape(EMPTY_PARTICIPANT_ERROR))
+		
+	def test_displays_participant_form(self):
+		initiative = Initiative.objects.create()
+		response = self.client.get(f'/initiative/{initiative.id}/')
+		self.assertIsInstance(response.context['form'], ParticipantForm)
+		self.assertContains(response, 'name="name"')
 		
 		
 class NewInitiativeTest(TestCase):
 	
-	def test_validation_errors_are_sent_back_to_home_page_template(self):
+	def test_for_invalid_input_renders_home_template(self):
 		response = self.client.post('/initiative/new', data={'name': ''})
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'initiative/home.html')
-		expected_error = escape("You can't have an empty initiative participant!")
-		self.assertContains(response, expected_error)
 	
-	def test_invalid_initiative_participants_arent_saved(self):
-		self.client.post('/initiative/new', data={'name': ''})
-		self.assertEqual(Initiative.objects.count(), 0)
-		self.assertEqual(Participant.objects.count(), 0)
-		
+	def test_validation_errors_are_shown_on_home_page(self):
+		response = self.client.post('/initiative/new', data={'name': ''})
+		self.assertContains(response, escape(EMPTY_PARTICIPANT_ERROR))
+	
+	def test_for_invalid_input_pass_form_to_template(self):
+		response = self.client.post('/initiative/new', data={'name': ''})
+		self.assertIsInstance(response.context['form'], ParticipantForm)
+
 		
 		

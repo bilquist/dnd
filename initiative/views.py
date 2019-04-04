@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from initiative.forms import ParticipantForm
+from initiative.forms import EMPTY_PARTICIPANT_ERROR, ParticipantForm
 from initiative.models import Initiative, Participant
 
 
@@ -15,27 +15,21 @@ def home_page(request):
 
 def view_initiative(request, initiative_id):
 	initiative = Initiative.objects.get(id=initiative_id)
-	error = None
-	
+	form = ParticipantForm()	
 	if request.method == 'POST':
-		try:
-			participant = Participant(name=request.POST['name'], initiative=initiative)
-			participant.full_clean()
-			participant.save()
+		form = ParticipantForm(data=request.POST)
+		if form.is_valid():
+			Participant.objects.create(name=request.POST['name'], initiative=initiative)
 			return redirect(initiative)
-		except ValidationError:
-			error = "You can't have an empty initiative participant!"
-	return render(request, 'initiative/initiative.html', {'initiative': initiative, 'error': error})
+	return render(request, 'initiative/initiative.html', {'initiative': initiative, 'form': form})
 	
 def new_initiative(request):
-	initiative = Initiative.objects.create()
-	participant = Participant(name=request.POST['name'], initiative=initiative)
-	try:
-		participant.full_clean()
-		participant.save()
-	except ValidationError:
-		initiative.delete()
-		error = "You can't have an empty initiative participant!"
-		return render(request, 'initiative/home.html', {'error': error})
-	return redirect(initiative)
+	form = ParticipantForm(data=request.POST)
+	if form.is_valid():
+		initiative = Initiative.objects.create()
+		Participant.objects.create(name=request.POST['name'], initiative=initiative)
+		return redirect(initiative)
+	else:
+		return render(request, 'initiative/home.html', {'form': form})
+
 
