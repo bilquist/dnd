@@ -17,40 +17,6 @@ class HomePageTest(TestCase):
 		self.assertTemplateUsed(response, 'initiative/home.html')
 
 
-class ParticipantModelTest(TestCase):
-	
-	def test_saving_and_retrieving_participants(self):
-		initiative = Initiative()
-		initiative.save()
-		
-		first_participant = Participant()
-		first_participant.name = 'Alice'
-		first_participant.is_pc = 1
-		first_participant.initiative = initiative
-		first_participant.save()
-		
-		second_participant = Participant()
-		second_participant.name = 'Bob'
-		second_participant.is_pc = 1
-		second_participant.initiative = initiative
-		second_participant.save()
-		
-		saved_initiative = Initiative.objects.first()
-		self.assertEqual(saved_initiative, initiative)
-		
-		saved_participants = Participant.objects.all()
-		self.assertEqual(saved_participants.count(), 2)
-		
-		first_saved_participant = saved_participants[0]
-		second_saved_participant = saved_participants[1]
-		self.assertEqual(first_saved_participant.name, 'Alice')
-		self.assertEqual(first_saved_participant.is_pc, 1)
-		self.assertEqual(first_saved_participant.initiative, initiative)
-		self.assertEqual(second_saved_participant.name, 'Bob')
-		self.assertEqual(second_saved_participant.initiative, initiative)
-		
-
-
 class InitiativeViewTest(TestCase):
 	
 	def test_uses_initiative_template(self):
