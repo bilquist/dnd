@@ -19,7 +19,7 @@ def view_initiative(request, initiative_id):
 	
 	if request.method == 'POST':
 		try:
-			participant = Participant(name=request.POST['participant_text'], initiative=initiative)
+			participant = Participant(name=request.POST['name'], initiative=initiative)
 			participant.full_clean()
 			participant.save()
 			return redirect(initiative)
@@ -29,7 +29,7 @@ def view_initiative(request, initiative_id):
 	
 def new_initiative(request):
 	initiative = Initiative.objects.create()
-	participant = Participant(name=request.POST['participant_text'], initiative=initiative)
+	participant = Participant(name=request.POST['name'], initiative=initiative)
 	try:
 		participant.full_clean()
 		participant.save()

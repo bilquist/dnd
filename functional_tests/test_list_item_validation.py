@@ -12,7 +12,7 @@ class ItemValidationTest(FunctionalTest):
 		# Alice goes to the home page and accidently tries to submit
 		# an empty initiative item. She hits Enter on the empty input box
 		self.browser.get(self.live_server_url)
-		self.browser.find_element_by_id('id_new_participant').send_keys(Keys.ENTER)
+		self.get_participant_input_box().send_keys(Keys.ENTER)
 		
 		# The home page refreshes, and there is an error message saying
 		# that initiative participants cannot be blank
@@ -22,12 +22,12 @@ class ItemValidationTest(FunctionalTest):
 		))
 		
 		# She tries again with some text for the participant, which now works
-		self.browser.find_element_by_id('id_new_participant').send_keys('Zilch the Puppet Master')
-		self.browser.find_element_by_id('id_new_participant').send_keys(Keys.ENTER)
+		self.get_participant_input_box().send_keys('Zilch the Puppet Master')
+		self.get_participant_input_box().send_keys(Keys.ENTER)
 		self.wait_for_row_in_participant_table('1: Zilch the Puppet Master')
 		
 		# Perversely, she now decides to submit a second blank participant
-		self.browser.find_element_by_id('id_new_participant').send_keys(Keys.ENTER)
+		self.get_participant_input_box().send_keys(Keys.ENTER)
 		
 		# She receives a similar warning on the initiative page
 		self.wait_for(lambda: self.assertEqual(
@@ -36,8 +36,8 @@ class ItemValidationTest(FunctionalTest):
 		))
 		
 		# And she can correct it by filling some text in
-		self.browser.find_element_by_id('id_new_participant').send_keys('Jim Puddington')
-		self.browser.find_element_by_id('id_new_participant').send_keys(Keys.ENTER)
+		self.get_participant_input_box().send_keys('Jim Puddington')
+		self.get_participant_input_box().send_keys(Keys.ENTER)
 		self.wait_for_row_in_participant_table('1: Zilch the Puppet Master')
 		self.wait_for_row_in_participant_table('2: Jim Puddington')
 		

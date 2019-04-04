@@ -20,7 +20,7 @@ class NewVisitorTest(FunctionalTest):
 		self.assertEqual('Start a new Initiative', header_text)
 		
 		# She is invited to enter a participant right away
-		inputbox = self.browser.find_element_by_id('id_new_participant')
+		inputbox = self.get_participant_input_box()
 		self.assertEqual(
 			inputbox.get_attribute('placeholder'),
 			'Enter a participant'
@@ -36,7 +36,7 @@ class NewVisitorTest(FunctionalTest):
 		
 		# There is still a text box inviting her to add another participant
 		# She enters, "Player Character 2"
-		inputbox = self.browser.find_element_by_id('id_new_participant')
+		inputbox = self.get_participant_input_box()
 		inputbox.send_keys('Player Character 2')
 		inputbox.send_keys(Keys.ENTER)
 		
@@ -49,7 +49,7 @@ class NewVisitorTest(FunctionalTest):
 	def test_multiple_users_can_start_lists_at_different_urls(self):
 		# Alice starts a new initiative
 		self.browser.get(self.live_server_url)
-		inputbox = self.browser.find_element_by_id('id_new_participant')
+		inputbox = self.get_participant_input_box()
 		inputbox.send_keys('Player Character 1')
 		inputbox.send_keys(Keys.ENTER)
 		self.wait_for_row_in_participant_table('1: Player Character 1')
@@ -74,7 +74,7 @@ class NewVisitorTest(FunctionalTest):
 		
 		# Francis starts a new initiative by entering a new participant. He
 		# is more interesting than Alice
-		inputbox = self.browser.find_element_by_id('id_new_participant')
+		inputbox = self.get_participant_input_box()
 		inputbox.send_keys('Gork the Exterminator!')
 		inputbox.send_keys(Keys.ENTER)
 		self.wait_for_row_in_participant_table('1: Gork the Exterminator!')

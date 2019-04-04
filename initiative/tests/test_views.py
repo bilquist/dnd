@@ -59,7 +59,7 @@ class InitiativeViewTest(TestCase):
 		
 		self.client.post(
 			f'/initiative/{correct_initiative.id}/',
-			data={'participant_text': 'James Ihara'}
+			data={'name': 'James Ihara'}
 		)
 		
 		self.assertEqual(Participant.objects.count(), 1)
@@ -73,7 +73,7 @@ class InitiativeViewTest(TestCase):
 		
 		response = self.client.post(
 			f'/initiative/{correct_initiative.id}/',
-			data={'participant_text': 'James Ihara'}
+			data={'name': 'James Ihara'}
 		)
 		
 		self.assertRedirects(response, f'/initiative/{correct_initiative.id}/')
@@ -82,7 +82,7 @@ class InitiativeViewTest(TestCase):
 		initiative = Initiative.objects.create()
 		response = self.client.post(
 			f'/initiative/{initiative.id}/',
-			data={'participant_text': ''}
+			data={'name': ''}
 		)
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'initiative/initiative.html')
@@ -93,14 +93,14 @@ class InitiativeViewTest(TestCase):
 class NewInitiativeTest(TestCase):
 	
 	def test_validation_errors_are_sent_back_to_home_page_template(self):
-		response = self.client.post('/initiative/new', data={'participant_text': ''})
+		response = self.client.post('/initiative/new', data={'name': ''})
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'initiative/home.html')
 		expected_error = escape("You can't have an empty initiative participant!")
 		self.assertContains(response, expected_error)
 	
 	def test_invalid_initiative_participants_arent_saved(self):
-		self.client.post('/initiative/new', data={'participant_text': ''})
+		self.client.post('/initiative/new', data={'name': ''})
 		self.assertEqual(Initiative.objects.count(), 0)
 		self.assertEqual(Participant.objects.count(), 0)
 		
