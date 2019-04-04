@@ -12,10 +12,17 @@ def home_page(request):
 
 def view_initiative(request, initiative_id):
 	initiative = Initiative.objects.get(id=initiative_id)
+	error = None
+	
 	if request.method == 'POST':
-		Participant.objects.create(name=request.POST['participant_text'], initiative=initiative)
-		return redirect(f'/initiative/{initiative.id}/')
-	return render(request, 'initiative/initiative.html', {'initiative': initiative})
+		try:
+			participant = Participant(name=request.POST['participant_text'], initiative=initiative)
+			participant.full_clean()
+			participant.save()
+			return redirect(f'/initiative/{initiative.id}/')
+		except ValidationError:
+			error = "You can't have an empty initiative participant!"
+	return render(request, 'initiative/initiative.html', {'initiative': initiative, 'error': error})
 	
 def new_initiative(request):
 	initiative = Initiative.objects.create()
@@ -25,7 +32,7 @@ def new_initiative(request):
 		participant.save()
 	except ValidationError:
 		initiative.delete()
-		error = "You can't have an empty list item!"
+		error = "You can't have an empty initiative participant!"
 		return render(request, 'initiative/home.html', {'error': error})
 	return redirect(f'/initiative/{initiative.id}/')
 

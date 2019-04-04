@@ -72,6 +72,17 @@ class InitiativeViewTest(TestCase):
 		)
 		
 		self.assertRedirects(response, f'/initiative/{correct_initiative.id}/')
+	
+	def test_validation_errors_end_up_on_initiative_page(self):
+		initiative = Initiative.objects.create()
+		response = self.client.post(
+			f'/initiative/{initiative.id}/',
+			data={'participant_text': ''}
+		)
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, 'initiative/initiative.html')
+		expected_error = escape("You can't have an empty initiative participant!")
+		self.assertContains(response, expected_error)
 		
 		
 class NewInitiativeTest(TestCase):
@@ -80,7 +91,7 @@ class NewInitiativeTest(TestCase):
 		response = self.client.post('/initiative/new', data={'participant_text': ''})
 		self.assertEqual(response.status_code, 200)
 		self.assertTemplateUsed(response, 'initiative/home.html')
-		expected_error = escape("You can't have an empty list item")
+		expected_error = escape("You can't have an empty initiative participant!")
 		self.assertContains(response, expected_error)
 	
 	def test_invalid_initiative_participants_arent_saved(self):
