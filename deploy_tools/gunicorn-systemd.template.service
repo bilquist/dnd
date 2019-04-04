@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn server for SITENAME
+
+[Service]
+Restart=on-failure
+User=bilquist
+WorkingDirectory=/home/bilquist/sites/SITENAME/source
+ExecStart=/home/bilquist/sites/SITENAME/virtualenv/bin/gunicorn \
+    --bind unix:/tmp/SITENAME.socket \
+    dnd.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
