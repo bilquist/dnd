@@ -1,10 +1,10 @@
 # initiative/test.py
 
-from django.urls import resolve
-from django.test import TestCase
 from django.http import HttpRequest
+from django.test import TestCase
+from django.urls import resolve
+from django.utils.html import escape
 from initiative.models import Initiative, Participant
-
 from initiative.views import home_page
 
 
@@ -74,7 +74,19 @@ class NewInitiativeTest(TestCase):
 			data={'participant_text': 'James Ihara'}
 		)
 		
-		
 		self.assertRedirects(response, f'/initiative/{correct_initiative.id}/')
+	
+	def test_validation_errors_are_sent_back_to_home_page_template(self):
+		response = self.client.post('/initiative/new', data={'participant_text': ''})
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, 'initiative/home.html')
+		expected_error = escape("You can't have an empty list item")
+		self.assertContains(response, expected_error)
+	
+	def test_invalid_initiative_participants_arent_saved(self):
+		self.client.post('/initiative/new', data={'participant_text': ''})
+		self.assertEqual(Initiative.objects.count(), 0)
+		self.assertEqual(Participant.objects.count(), 0)
+		
 		
 		

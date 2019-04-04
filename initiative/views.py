@@ -1,7 +1,8 @@
 # initiative/views.py
 
-from django.shortcuts import redirect, render
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
+from django.shortcuts import redirect, render
 from initiative.models import Initiative, Participant
 
 
@@ -15,7 +16,14 @@ def initiative_list(request, initiative_id):
 	
 def new_initiative(request):
 	initiative = Initiative.objects.create()
-	Participant.objects.create(name=request.POST['participant_text'], initiative=initiative)
+	participant = Participant(name=request.POST['participant_text'], initiative=initiative)
+	try:
+		participant.full_clean()
+		participant.save()
+	except ValidationError:
+		initiative.delete()
+		error = "You can't have an empty list item!"
+		return render(request, 'initiative/home.html', {'error': error})
 	return redirect(f'/initiative/{initiative.id}/')
 
 def add_participant(request, initiative_id):

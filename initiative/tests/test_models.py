@@ -1,5 +1,6 @@
 # initiative/test.py
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from initiative.models import Initiative, Participant
 
@@ -37,5 +38,11 @@ class ParticipantModelsTest(TestCase):
 		self.assertEqual(first_saved_participant.initiative, initiative)
 		self.assertEqual(second_saved_participant.name, 'Bob')
 		self.assertEqual(second_saved_participant.initiative, initiative)
-
+	
+	def test_cannot_save_empty_initiative_participants(self):
+		initiative = Initiative.objects.create()
+		participant = Participant(name='', initiative=initiative)
+		with self.assertRaises(ValidationError):
+			participant.save()
+			participant.full_clean()
 		
