@@ -4,6 +4,7 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import resolve
 from django.utils.html import escape
+from initiative.forms import ParticipantForm
 from initiative.models import Initiative, Participant
 from initiative.views import home_page
 
@@ -15,6 +16,10 @@ class HomePageTest(TestCase):
 	def test_home_page_returns_correct_html(self):
 		response = self.client.get('/')
 		self.assertTemplateUsed(response, 'initiative/home.html')
+	
+	def test_home_page_uses_participant_form(self):
+		response = self.client.get('/')
+		self.assertIsInstance(response.context['form'], ParticipantForm)
 
 
 class InitiativeViewTest(TestCase):

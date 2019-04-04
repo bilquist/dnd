@@ -3,12 +3,15 @@
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+
+from initiative.forms import ParticipantForm
 from initiative.models import Initiative, Participant
+
 
 
 # Create your views here.
 def home_page(request):
-	return render(request, 'initiative/home.html')
+	return render(request, 'initiative/home.html', {'form': ParticipantForm()})
 
 def view_initiative(request, initiative_id):
 	initiative = Initiative.objects.get(id=initiative_id)
