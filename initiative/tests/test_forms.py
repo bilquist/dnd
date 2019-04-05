@@ -45,5 +45,11 @@ class ExistingInitiativeParticipantFormTest(TestCase):
 		form = ExistingInitiativeParticipantForm(for_initiative=initiative, data={'name': 'no twins!'})
 		self.assertFalse(form.is_valid())
 		self.assertEqual(form.errors['name'], [DUPLICATE_PARTICIPANT_ERROR])
+	
+	def test_form_save(self):
+		initiative = Initiative.objects.create()
+		form = ExistingInitiativeParticipantForm(for_initiative=initiative, data={'name': 'my_name'})
+		new_participant = form.save()
+		self.assertEqual(new_participant, Participant.objects.all()[0])
 		
 		

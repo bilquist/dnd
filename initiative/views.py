@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from initiative.forms import EMPTY_PARTICIPANT_ERROR, ParticipantForm
+from initiative.forms import ExistingInitiativeParticipantForm, ParticipantForm
 from initiative.models import Initiative, Participant
 
 
@@ -15,11 +15,11 @@ def home_page(request):
 
 def view_initiative(request, initiative_id):
 	initiative = Initiative.objects.get(id=initiative_id)
-	form = ParticipantForm()	
+	form = ExistingInitiativeParticipantForm(for_initiative=initiative)
 	if request.method == 'POST':
-		form = ParticipantForm(data=request.POST)
+		form = ExistingInitiativeParticipantForm(for_initiative=initiative, data=request.POST)
 		if form.is_valid():
-			form.save(for_initiative=initiative)
+			form.save()
 			return redirect(initiative)
 	return render(request, 'initiative/initiative.html', {'initiative': initiative, 'form': form})
 	

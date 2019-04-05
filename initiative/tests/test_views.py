@@ -4,7 +4,10 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import resolve
 from django.utils.html import escape
-from initiative.forms import ParticipantForm, EMPTY_PARTICIPANT_ERROR
+from initiative.forms import (
+	DUPLICATE_PARTICIPANT_ERROR, EMPTY_PARTICIPANT_ERROR,
+	ExistingInitiativeParticipantForm, ParticipantForm
+)
 from initiative.models import Initiative, Participant
 from initiative.views import home_page
 from unittest import skip
@@ -97,7 +100,7 @@ class InitiativeViewTest(TestCase):
 	
 	def test_for_invalid_input_passes_form_to_template(self):
 		response = self.post_invalid_input()
-		self.assertIsInstance(response.context['form'], ParticipantForm)
+		self.assertIsInstance(response.context['form'], ExistingInitiativeParticipantForm)
 	
 	def test_for_invalid_input_shows_error_on_page(self):
 		response = self.post_invalid_input()
@@ -106,10 +109,9 @@ class InitiativeViewTest(TestCase):
 	def test_displays_participant_form(self):
 		initiative = Initiative.objects.create()
 		response = self.client.get(f'/initiative/{initiative.id}/')
-		self.assertIsInstance(response.context['form'], ParticipantForm)
+		self.assertIsInstance(response.context['form'], ExistingInitiativeParticipantForm)
 		self.assertContains(response, 'name="name"')
 	
-	@skip
 	def test_duplicate_participant_validation_errors_end_up_on_initiatives_page(self):
 		initiative1 = Initiative.objects.create()
 		participant1 = Participant.objects.create(name='textey', initiative=initiative1)
@@ -118,7 +120,7 @@ class InitiativeViewTest(TestCase):
 			data={'name': 'textey'}
 		)
 		
-		expected_error = escape("You've already got this in your list!")
+		expected_error = escape(DUPLICATE_PARTICIPANT_ERROR)
 		self.assertContains(response, expected_error)
 		self.assertTemplateUsed(response, 'initiative/initiative.html')
 		self.assertEqual(Participant.objects.all().count(), 1)

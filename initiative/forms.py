@@ -41,4 +41,7 @@ class ExistingInitiativeParticipantForm(ParticipantForm):
 			e.error_dict = {'name': [DUPLICATE_PARTICIPANT_ERROR]}
 			self._update_errors(e)
 	
+	def save(self):
+		return forms.models.ModelForm.save(self)
+	
 	
