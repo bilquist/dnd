@@ -7,6 +7,7 @@ from django.utils.html import escape
 from initiative.forms import ParticipantForm, EMPTY_PARTICIPANT_ERROR
 from initiative.models import Initiative, Participant
 from initiative.views import home_page
+from unittest import skip
 
 
 
@@ -107,6 +108,20 @@ class InitiativeViewTest(TestCase):
 		response = self.client.get(f'/initiative/{initiative.id}/')
 		self.assertIsInstance(response.context['form'], ParticipantForm)
 		self.assertContains(response, 'name="name"')
+	
+	@skip
+	def test_duplicate_participant_validation_errors_end_up_on_initiatives_page(self):
+		initiative1 = Initiative.objects.create()
+		participant1 = Participant.objects.create(name='textey', initiative=initiative1)
+		response = self.client.post(
+			f'/initiative/{initiative1.id}/',
+			data={'name': 'textey'}
+		)
+		
+		expected_error = escape("You've already got this in your list!")
+		self.assertContains(response, expected_error)
+		self.assertTemplateUsed(response, 'initiative/initiative.html')
+		self.assertEqual(Participant.objects.all().count(), 1)
 		
 		
 class NewInitiativeTest(TestCase):
