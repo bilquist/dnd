@@ -21,13 +21,19 @@
 	
 	<script>
 		QUnit.test("errors should be hidden on keypress", function(assert) {
-			initialize();
+			window.Dnd.initialize();
 			$('input[name="name"]').trigger('keypress');
 			assert.equal($('.has-error').is(':visible'), false);
 		});
 		QUnit.test("errors aren't hidden if there is no keypress", function(assert) {
-			initialize();
+			window.Dnd.initialize();
 			assert.equal($('.has-error').is(':visible'), true);
+		});
+		QUnit.test("errors should be hidden on inputbox focus", function(assert) {
+			window.Dnd.initialize_focus();
+			assert.equal($('.has-error').is(':visible'), true);
+			$('input[name="name"]').focus();
+			assert.equal($('.has-error').is(':visible'), false);
 		});
 	</script>
 	

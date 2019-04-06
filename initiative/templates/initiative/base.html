@@ -43,7 +43,10 @@
 		<script src="/static/initiative.js"></script>
 		
 		<script>
-			initialize();
+			$(document).ready(function() {
+				window.Dnd.initialize();
+				window.Dnd.initialize_focus();
+			});
 		</script>
 		
 	</body>
