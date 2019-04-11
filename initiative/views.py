@@ -1,5 +1,6 @@
 # initiative/views.py
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -8,6 +9,8 @@ from initiative.forms import ExistingInitiativeParticipantForm, ParticipantForm
 from initiative.models import Initiative, Participant
 
 
+
+User = get_user_model()
 
 # Create your views here.
 def home_page(request):
@@ -33,4 +36,6 @@ def new_initiative(request):
 		return render(request, 'initiative/home.html', {'form': form})
 
 def my_initiatives(request, email):
-	return render(request, 'initiative/my_initiatives.html')
+	owner = User.objects.get(email=email)
+	return render(request, 'initiative/my_initiatives.html', {'owner': owner})
+	

@@ -1,5 +1,6 @@
 # initiative/test.py
 
+from django.contrib.auth import get_user_model
 from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import resolve
@@ -13,6 +14,8 @@ from initiative.views import home_page
 from unittest import skip
 
 
+
+User = get_user_model()
 
 # Create your tests here.
 class HomePageTest(TestCase):
@@ -145,5 +148,21 @@ class NewInitiativeTest(TestCase):
 class MyInitiativesTest(TestCase):
 	
 	def test_my_initiatives_url_renders_my_initiatives_template(self):
+		User.objects.create(email='a@b.com')
 		response = self.client.get('/initiative/users/a@b.com/')
 		self.assertTemplateUsed(response, 'initiative/my_initiatives.html')
+	
+	def test_passes_correct_owner_to_template(self):
+		User.objects.create(email='wrong@owner.com')
+		correct_user = User.objects.create(email='correct@owner.com')
+		response = self.client.get('/initiative/users/correct@owner.com/')
+		self.assertEqual(response.context['owner'], correct_user)
+	
+	def test_initiative_owner_is_saved_if_user_is_authenticated(self):
+		user = User.objects.create(email='a@b.com')
+		self.client.force_login(user)
+		self.client.post('/initiative/new', data={'name': 'Player Gronk'})
+		initiative = Initiative.objects.first()
+		self.assertEqual(initiative.owner, user)
+		
+		
