@@ -1,0 +1,14 @@
+{% extends 'initiative/base.html' %}
+
+{% block header_text %}My Initiatives{% endblock %}
+
+{% block initiative_form %}{% endblock %}
+
+{% block extra_content %}
+	<h2>{{ owner.email }}'s initiatives</h2>
+	<ul>
+		{% for initiative in owner.initiative_set.all %}
+			<li><a href="{{ initiative.get_absolute_url }}">{{ initiative.name }}</a></li>
+		{% endfor %}
+	</ul>
+{% endblock %}

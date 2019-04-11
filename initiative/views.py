@@ -32,4 +32,5 @@ def new_initiative(request):
 	else:
 		return render(request, 'initiative/home.html', {'form': form})
 
-
+def my_initiatives(request, email):
+	return render(request, 'initiative/my_initiatives.html')

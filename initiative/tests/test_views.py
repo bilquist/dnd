@@ -142,4 +142,8 @@ class NewInitiativeTest(TestCase):
 		self.assertIsInstance(response.context['form'], ParticipantForm)
 
 		
-		
+class MyInitiativesTest(TestCase):
+	
+	def test_my_initiatives_url_renders_my_initiatives_template(self):
+		response = self.client.get('/initiative/users/a@b.com/')
+		self.assertTemplateUsed(response, 'initiative/my_initiatives.html')

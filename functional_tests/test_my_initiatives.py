@@ -8,6 +8,8 @@ from .base import FunctionalTest
 from .management.commands.create_session import create_pre_authenticated_session
 from .server_tools import create_session_on_server
 
+import time
+
 
 
 User = get_user_model()
@@ -29,10 +31,46 @@ class MyInitiativesTest(FunctionalTest):
 		))
 	
 	def test_logged_in_users_initiatives_are_saved_as_my_initiatives(self):
-		email = 'alice@example.com'
-		self.browser.get(self.live_server_url)
-		self.wait_to_be_logged_out(email)
 		# Alice is a logged-in user
-		self.create_pre_authenticated_session(email)
+		self.create_pre_authenticated_session('alice@example.com')
+		
+		# She goes to the home page and starts a list
 		self.browser.get(self.live_server_url)
-		self.wait_to_be_logged_in(email)
+		self.add_initiative_participant('Player 1')
+		self.add_initiative_participant('Player 2')
+		first_initiative_url = self.browser.current_url
+		
+		# She notices a "My initiatives" link, for the first time.
+		self.browser.find_element_by_link_text('My initiatives').click()
+		
+		# She sees that her initiative is in there, named according to its first
+		# initiative participant
+		self.wait_for(
+			lambda: self.browser.find_element_by_link_text('Player 1')
+		)
+		self.browser.find_element_by_link_text('Player 1').click()
+		self.wait_for(
+			lambda: self.assertEqual(self.browser.current_url, first_initiative_url)
+		)
+		
+		# She decides to start another initiative, just to see
+		self.add_initiative_participant('Monster 1')
+		second_initiative_url = self.browser.current_url
+		
+		# Under "my lists", her new list appears
+		self.browser.find_element_by_link_text('My initiatives').click()
+		self.wait_for(
+			lambda: self.browser.find_element_by_link_text('Monster 1')
+		)
+		self.browser.find_element_by_link_text('Monster 1').click()
+		self.wait_for(
+			lambda: self.assertEqual(self.browser.current_url, second_initiative_url)
+		)
+		
+		# She logs out. The "My initiatives" option disappears
+		self.browser.find_element_by_link_text('Log out').click()
+		self.wait_for(
+			lambda: assertEqual(self.browser.find_elements_by_link_text('My initiative')),
+			[]
+		)
+	

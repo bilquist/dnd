@@ -24,4 +24,5 @@ from initiative import views
 urlpatterns = [
 	path('new', views.new_initiative, name='new_initiative'),
 	path('<int:initiative_id>/', views.view_initiative, name='view_initiative'),
+	path('users/<str:email>/', views.my_initiatives, name='my_initiatives'),
 ]

@@ -62,9 +62,6 @@ class FunctionalTest(StaticLiveServerTestCase):
 				time.sleep(0.5)
 		"""
 	
-	def get_participant_input_box(self):
-		return self.browser.find_element_by_id('id_name')
-	
 	@wait
 	def wait_to_be_logged_in(self, email):
 		self.browser.find_element_by_link_text('Log out')
@@ -90,4 +87,17 @@ class FunctionalTest(StaticLiveServerTestCase):
 		navbar = self.browser.find_element_by_css_selector('.navbar')
 		self.assertNotIn(email, navbar.text)
 		"""
+		
+	def get_participant_input_box(self):
+		return self.browser.find_element_by_id('id_name')
+		
+	def add_initiative_participant(self, participant_text):
+		num_rows = len(self.browser.find_elements_by_css_selector('#id_participant_table tr'))
+		self.get_participant_input_box().send_keys(participant_text)
+		self.get_participant_input_box().send_keys(Keys.ENTER)
+		participant_number = num_rows + 1
+		self.wait_for_row_in_participant_table(
+			'{}: {}'.format(participant_number, participant_text)
+		)
+	
 	
