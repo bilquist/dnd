@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 	'corsheaders',
 	'initiative',
 	'accounts',
+	'functional_tests',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
