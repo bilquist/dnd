@@ -22,7 +22,7 @@ def _create_directory_structure_if_necessary(site_folder):
 
 def _get_latest_source(source_folder):
 	if exists(source_folder + '/.git'):
-		run(f'cd {source_folder} && git pull')
+		run(f'cd {source_folder} && git fetch') # pull vs fetch?
 	else:
 		run(f'git clone {REPO_URL} {source_folder}')
 	current_commit = local("git log -n l --format=%H", capture=True)
