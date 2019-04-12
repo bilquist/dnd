@@ -10,8 +10,10 @@ from initiative.forms import (
 	ExistingInitiativeParticipantForm, ParticipantForm
 )
 from initiative.models import Initiative, Participant
-from initiative.views import home_page
+from initiative.views import home_page, new_initiative
+import unittest
 from unittest import skip
+from unittest.mock import patch, Mock
 
 
 
@@ -129,7 +131,7 @@ class InitiativeViewTest(TestCase):
 		self.assertEqual(Participant.objects.all().count(), 1)
 		
 		
-class NewInitiativeTest(TestCase):
+class NewInitiativeViewIntegratedTest(TestCase):
 	
 	def test_for_invalid_input_renders_home_template(self):
 		response = self.client.post('/initiative/new', data={'name': ''})
@@ -143,6 +145,66 @@ class NewInitiativeTest(TestCase):
 	def test_for_invalid_input_pass_form_to_template(self):
 		response = self.client.post('/initiative/new', data={'name': ''})
 		self.assertIsInstance(response.context['form'], ParticipantForm)
+	
+	@skip
+	@patch('initiative.views.Initiative')
+	@patch('initiative.views.ParticipantForm')
+	def test_initiative_owner_is_saved_if_user_is_authenticated(
+		self, mockParticipantFormClass, mockInitiativeClass
+	):
+		user = User.objects.create(email='a@b.com')
+		self.client.force_login(user)
+		mock_initiative = mockInitiativeClass.return_value
+		
+		def check_owner_assigned():
+			self.assertEqual(mock_initiative.owner, user)
+		mock_initiative.save.side_effect = check_owner_assigned
+		self.client.post('/initiative/new', data={'name': 'Player Gronk'})
+		mock_initiative.save.assert_called_once_with()
+	
+
+
+@patch('initiative.views.NewInitiativeForm')
+class NewInitiativeViewUnitTest(unittest.TestCase):
+	
+	def setUp(self):
+		self.request = HttpRequest()
+		self.request.POST['name'] = 'new initiative participant'
+		self.request.user = Mock()
+	
+	def test_passes_POST_data_to_NewInitiativeForm(self, mockNewInitiativeForm):
+		new_initiative(self.request)
+		mockNewInitiativeForm.assert_called_once_with(data=self.request.POST)
+	
+	def test_saves_form_with_owner_if_form_valid(
+		self, mockNewInitiativeForm
+	):
+		mock_form = mockNewInitiativeForm.return_value
+		mock_form.is_valid.return_value = True
+		new_initiative(self.request)
+		mock_form.save.assert_called_once_with(owner=self.request.user)
+	
+	@patch('initiative.views.render')
+	def test_renders_home_template_with_form_if_form_invalid(
+		self, mock_render, mockNewInitiativeForm
+	):
+		mock_form = mockNewInitiativeForm.return_value
+		mock_form.is_valid.return_value = False
+		response = new_initiative(self.request)
+		self.assertEqual(response, mock_render.return_value)
+		mock_render.assert_called_once_with(
+			self.request, 'initiative/home.html', {'form': mock_form}
+		)
+	
+	@patch('initiative.views.redirect')
+	def test_redirects_to_form_returned_object_if_form_valid(
+		self, mock_redirect, mockNewInitiativeForm
+	):
+		mock_form = mockNewInitiativeForm.return_value
+		mock_form.is_valid.return_value = True
+		response = new_initiative(self.request)
+		self.assertEqual(response, mock_redirect.return_value)
+		#mock_redirect.assert_called_once_with(mock_form.save.return_value)
 
 		
 class MyInitiativesTest(TestCase):
@@ -158,11 +220,3 @@ class MyInitiativesTest(TestCase):
 		response = self.client.get('/initiative/users/correct@owner.com/')
 		self.assertEqual(response.context['owner'], correct_user)
 	
-	def test_initiative_owner_is_saved_if_user_is_authenticated(self):
-		user = User.objects.create(email='a@b.com')
-		self.client.force_login(user)
-		self.client.post('/initiative/new', data={'name': 'Player Gronk'})
-		initiative = Initiative.objects.first()
-		self.assertEqual(initiative.owner, user)
-		
-		

@@ -34,7 +34,7 @@ class SendLoginEmailViewTest(TestCase):
 		
 		self.assertTrue(self.send_mail_called)
 		self.assertEqual(self.subject, 'Your login link for DnD Initiative')
-		self.assertEqual(self.from_email, 'noreply@initiative')
+		self.assertEqual(self.from_email, 'noreply@initiative.com')
 		self.assertEqual(self.to_list, ['alice@example.com'])
 	
 	@patch('accounts.views.send_mail')
@@ -45,7 +45,7 @@ class SendLoginEmailViewTest(TestCase):
 		self.assertEqual(mock_send_mail.called, True)
 		(subject, body, from_email, to_list), kwargs = mock_send_mail.call_args
 		self.assertEqual(subject, 'Your login link for DnD Initiative')
-		self.assertEqual(from_email, 'noreply@initiative')
+		self.assertEqual(from_email, 'noreply@initiative.com')
 		self.assertEqual(to_list, ['alice@example.com'])
 	
 	def test_adds_success_message(self):
@@ -99,10 +99,10 @@ class LoginViewTest(TestCase):
 		self.assertRedirects(response, '/')
 	
 	def test_calls_authenticate_with_uid_from_get_request(self, mock_auth):
-		self.client.get('/accounts/login?token=abcd123')
+		response = self.client.get('/accounts/login?token=abcd123')
 		self.assertEqual(
 			mock_auth.authenticate.call_args,
-			call(uid='abcd123')
+			call(response.wsgi_request, uid='abcd123')
 		)
 	
 	def test_calls_auth_login_with_user_if_there_is_one(self, mock_auth):

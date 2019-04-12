@@ -1,10 +1,13 @@
 # initiative/test.py
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from initiative.models import Initiative, Participant
 
 
+
+User = get_user_model()
 
 # Create your tests here.
 class InitiativeAndParticipantModelsTest(TestCase):
@@ -22,6 +25,31 @@ class InitiativeModelTest(TestCase):
 	def test_get_absolute_url(self):
 		initiative = Initiative.objects.create()
 		self.assertEqual(initiative.get_absolute_url(), f'/initiative/{initiative.id}/')
+	
+	def test_create_new_creates_initiative_and_first_participant(self):
+		Initiative.create_new(first_participant_text='Player A')
+		new_participant = Participant.objects.first()
+		self.assertEqual(new_participant.name, 'Player A')
+		new_initiative = Initiative.objects.first()
+		self.assertEqual(new_participant.initiative, new_initiative)
+	
+	def test_create_new_optionally_saves_owner(self):
+		user = User.objects.create()
+		Initiative.create_new(first_participant_text='Player A', owner=user)
+		new_initiative = Initiative.objects.first()
+		self.assertEqual(new_initiative.owner, user)
+	
+	def test_initiatives_can_have_owners(self):
+		Initiative(owner=User()) # should not raise
+	
+	def test_list_owner_is_optional(self):
+		Initiative().full_clean()
+	
+	def test_initiative_name_is_first_participant_name(self):
+		initiative = Initiative.objects.create()
+		Participant.objects.create(initiative=initiative, name='Monster 1')
+		Participant.objects.create(initiative=initiative, name='Monster 2')
+		self.assertEqual(initiative.name, 'Monster 1')
 
 
 class ParticipantModelTest(TestCase):

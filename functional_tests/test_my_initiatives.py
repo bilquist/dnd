@@ -54,6 +54,7 @@ class MyInitiativesTest(FunctionalTest):
 		)
 		
 		# She decides to start another initiative, just to see
+		self.browser.get(self.live_server_url)
 		self.add_initiative_participant('Monster 1')
 		second_initiative_url = self.browser.current_url
 		
@@ -70,7 +71,7 @@ class MyInitiativesTest(FunctionalTest):
 		# She logs out. The "My initiatives" option disappears
 		self.browser.find_element_by_link_text('Log out').click()
 		self.wait_for(
-			lambda: assertEqual(self.browser.find_elements_by_link_text('My initiative')),
+			lambda: self.assertEqual(self.browser.find_elements_by_link_text('My initiative'),
 			[]
-		)
+		))
 	

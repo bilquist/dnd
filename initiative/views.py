@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from initiative.forms import ExistingInitiativeParticipantForm, ParticipantForm
+from initiative.forms import ExistingInitiativeParticipantForm, ParticipantForm, NewInitiativeForm
 from initiative.models import Initiative, Participant
 
 
@@ -27,13 +27,12 @@ def view_initiative(request, initiative_id):
 	return render(request, 'initiative/initiative.html', {'initiative': initiative, 'form': form})
 	
 def new_initiative(request):
-	form = ParticipantForm(data=request.POST)
+	form = NewInitiativeForm(data=request.POST)
 	if form.is_valid():
-		initiative = Initiative.objects.create()
-		Participant.objects.create(name=request.POST['name'], initiative=initiative)
-		return redirect(initiative)
-	else:
-		return render(request, 'initiative/home.html', {'form': form})
+		initiative = form.save(owner=request.user)
+		return redirect(str(initiative.get_absolute_url()))
+	return render(request, 'initiative/home.html', {'form': form})
+
 
 def my_initiatives(request, email):
 	owner = User.objects.get(email=email)
